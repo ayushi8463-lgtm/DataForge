@@ -1,0 +1,352 @@
+{
+  "timestamp": "2026-02-07T02:44:46.720400",
+  "validation_status": "FAILED",
+  "validation_checks": {
+    "customers\u2192purchases": {
+      "row_count": {
+        "check": "row_count_comparison",
+        "source_count": 100,
+        "target_count": 100,
+        "passed": true,
+        "message": "Source: 100, Target: 100"
+      },
+      "null_consistency": {
+        "check": "null_consistency",
+        "details": [
+          {
+            "column": "customer_id\u2192client_id",
+            "source_nulls": 0,
+            "target_nulls": 0,
+            "matched": true
+          },
+          {
+            "column": "full_name\u2192purchase_state",
+            "source_nulls": 0,
+            "target_nulls": 0,
+            "matched": true
+          },
+          {
+            "column": "email_address\u2192purchase_timestamp",
+            "source_nulls": 0,
+            "target_nulls": 0,
+            "matched": true
+          },
+          {
+            "column": "phone_number\u2192purchase_timestamp",
+            "source_nulls": 0,
+            "target_nulls": 0,
+            "matched": true
+          },
+          {
+            "column": "registration_date\u2192purchase_timestamp",
+            "source_nulls": 0,
+            "target_nulls": 0,
+            "matched": true
+          },
+          {
+            "column": "customer_status\u2192purchase_state",
+            "source_nulls": 0,
+            "target_nulls": 0,
+            "matched": true
+          }
+        ],
+        "passed": true
+      },
+      "duplicates": {
+        "check": "duplicate_detection",
+        "total_rows": 100,
+        "passed": true,
+        "message": "No duplicate check implemented (would check primary keys)"
+      },
+      "data_types": {
+        "check": "data_type_validation",
+        "details": [
+          {
+            "column": "customer_id\u2192client_id",
+            "source_type": "INTEGER",
+            "target_type": "INTEGER",
+            "transformation_required": false,
+            "passed": true
+          },
+          {
+            "column": "full_name\u2192purchase_state",
+            "source_type": "TEXT",
+            "target_type": "TEXT",
+            "transformation_required": false,
+            "passed": true
+          },
+          {
+            "column": "email_address\u2192purchase_timestamp",
+            "source_type": "TEXT",
+            "target_type": "TEXT",
+            "transformation_required": false,
+            "passed": true
+          },
+          {
+            "column": "phone_number\u2192purchase_timestamp",
+            "source_type": "TEXT",
+            "target_type": "TEXT",
+            "transformation_required": false,
+            "passed": true
+          },
+          {
+            "column": "registration_date\u2192purchase_timestamp",
+            "source_type": "DATE",
+            "target_type": "TEXT",
+            "transformation_required": true,
+            "passed": true
+          },
+          {
+            "column": "customer_status\u2192purchase_state",
+            "source_type": "TEXT",
+            "target_type": "TEXT",
+            "transformation_required": false,
+            "passed": true
+          }
+        ],
+        "passed": true
+      }
+    },
+    "products\u2192purchases": {
+      "row_count": {
+        "check": "row_count_comparison",
+        "source_count": 50,
+        "target_count": 100,
+        "passed": false,
+        "message": "Source: 50, Target: 100"
+      },
+      "null_consistency": {
+        "check": "null_consistency",
+        "details": [
+          {
+            "column": "product_id\u2192purchase_id",
+            "source_nulls": 0,
+            "target_nulls": 0,
+            "matched": true
+          },
+          {
+            "column": "product_name\u2192purchase_state",
+            "source_nulls": 0,
+            "target_nulls": 0,
+            "matched": true
+          },
+          {
+            "column": "product_category\u2192purchase_state",
+            "source_nulls": 0,
+            "target_nulls": 0,
+            "matched": true
+          },
+          {
+            "column": "unit_price\u2192total_cost",
+            "source_nulls": 0,
+            "target_nulls": 100,
+            "matched": false
+          },
+          {
+            "column": "stock_quantity\u2192client_id",
+            "source_nulls": 0,
+            "target_nulls": 0,
+            "matched": true
+          }
+        ],
+        "passed": false
+      },
+      "duplicates": {
+        "check": "duplicate_detection",
+        "total_rows": 100,
+        "passed": true,
+        "message": "No duplicate check implemented (would check primary keys)"
+      },
+      "data_types": {
+        "check": "data_type_validation",
+        "details": [
+          {
+            "column": "product_id\u2192purchase_id",
+            "source_type": "INTEGER",
+            "target_type": "INTEGER",
+            "transformation_required": false,
+            "passed": true
+          },
+          {
+            "column": "product_name\u2192purchase_state",
+            "source_type": "TEXT",
+            "target_type": "TEXT",
+            "transformation_required": false,
+            "passed": true
+          },
+          {
+            "column": "product_category\u2192purchase_state",
+            "source_type": "TEXT",
+            "target_type": "TEXT",
+            "transformation_required": false,
+            "passed": true
+          },
+          {
+            "column": "unit_price\u2192total_cost",
+            "source_type": "REAL",
+            "target_type": "REAL",
+            "transformation_required": false,
+            "passed": true
+          },
+          {
+            "column": "stock_quantity\u2192client_id",
+            "source_type": "INTEGER",
+            "target_type": "INTEGER",
+            "transformation_required": false,
+            "passed": true
+          }
+        ],
+        "passed": true
+      }
+    },
+    "order_items\u2192items": {
+      "row_count": {
+        "check": "row_count_comparison",
+        "source_count": 633,
+        "target_count": 0,
+        "passed": false,
+        "message": "Source: 633, Target: 0"
+      },
+      "null_consistency": {
+        "check": "null_consistency",
+        "details": [
+          {
+            "column": "item_id\u2192item_id",
+            "source_nulls": 0,
+            "target_nulls": 0,
+            "matched": true
+          },
+          {
+            "column": "order_id\u2192item_id",
+            "source_nulls": 0,
+            "target_nulls": 0,
+            "matched": true
+          },
+          {
+            "column": "product_id\u2192item_id",
+            "source_nulls": 0,
+            "target_nulls": 0,
+            "matched": true
+          },
+          {
+            "column": "quantity\u2192stock_count",
+            "source_nulls": 0,
+            "target_nulls": 0,
+            "matched": true
+          },
+          {
+            "column": "item_price\u2192price",
+            "source_nulls": 0,
+            "target_nulls": 0,
+            "matched": true
+          }
+        ],
+        "passed": true
+      },
+      "duplicates": {
+        "check": "duplicate_detection",
+        "total_rows": 0,
+        "passed": true,
+        "message": "No duplicate check implemented (would check primary keys)"
+      },
+      "data_types": {
+        "check": "data_type_validation",
+        "details": [
+          {
+            "column": "item_id\u2192item_id",
+            "source_type": "INTEGER",
+            "target_type": "INTEGER",
+            "transformation_required": false,
+            "passed": true
+          },
+          {
+            "column": "order_id\u2192item_id",
+            "source_type": "INTEGER",
+            "target_type": "INTEGER",
+            "transformation_required": false,
+            "passed": true
+          },
+          {
+            "column": "product_id\u2192item_id",
+            "source_type": "INTEGER",
+            "target_type": "INTEGER",
+            "transformation_required": false,
+            "passed": true
+          },
+          {
+            "column": "quantity\u2192stock_count",
+            "source_type": "INTEGER",
+            "target_type": "INTEGER",
+            "transformation_required": false,
+            "passed": true
+          },
+          {
+            "column": "item_price\u2192price",
+            "source_type": "REAL",
+            "target_type": "REAL",
+            "transformation_required": false,
+            "passed": true
+          }
+        ],
+        "passed": true
+      }
+    }
+  },
+  "round_trip_analysis": {
+    "test": "round_trip_validation",
+    "tables_tested": 3,
+    "perfect_round_trips": 2,
+    "acceptable_loss": 0,
+    "data_loss_detected": 1,
+    "details": {
+      "customers\u2192purchases": {
+        "status": "DATA_LOSS",
+        "perfect_round_trip_fields": [
+          "customer_id",
+          "full_name",
+          "email_address",
+          "phone_number",
+          "customer_status"
+        ],
+        "acceptable_loss_fields": [],
+        "data_loss_fields": [
+          {
+            "field": "registration_date",
+            "reason": "Conversion to TEXT - reverse parse from TEXT to DATE may fail"
+          }
+        ],
+        "perfect_percentage": 83.33333333333334
+      },
+      "products\u2192purchases": {
+        "status": "PERFECT",
+        "perfect_round_trip_fields": [
+          "product_id",
+          "product_name",
+          "product_category",
+          "unit_price",
+          "stock_quantity"
+        ],
+        "acceptable_loss_fields": [],
+        "data_loss_fields": [],
+        "perfect_percentage": 100.0
+      },
+      "order_items\u2192items": {
+        "status": "PERFECT",
+        "perfect_round_trip_fields": [
+          "item_id",
+          "order_id",
+          "product_id",
+          "quantity",
+          "item_price"
+        ],
+        "acceptable_loss_fields": [],
+        "data_loss_fields": [],
+        "perfect_percentage": 100.0
+      }
+    }
+  },
+  "recommendations": [
+    "\u26a0\ufe0f Data loss detected in reverse mappings. Review non-reversible transformations.",
+    "\u274c Validation failed. Review row counts and null consistency."
+  ]
+}

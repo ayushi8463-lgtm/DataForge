@@ -1,0 +1,330 @@
+{
+  "timestamp": "2026-02-07T02:44:46.720374",
+  "forward_mappings": {
+    "customers\u2192purchases": [
+      {
+        "source": "customer_id",
+        "target": "client_id",
+        "confidence": 0.9,
+        "types": "INTEGER \u2192 INTEGER",
+        "transformation_required": false,
+        "explanation": {
+          "name_match": "Semantic match found: common keywords {'cust', 'buyer', 'customer', 'client'} (score: 1.00)",
+          "type_match": "Exact type match (score: 1.00)",
+          "pattern_match": "Insufficient sample data (score: 0.50)"
+        }
+      },
+      {
+        "source": "full_name",
+        "target": "purchase_state",
+        "confidence": 0.574,
+        "types": "TEXT \u2192 TEXT",
+        "transformation_required": false,
+        "explanation": {
+          "name_match": "String similarity: 34.78% (score: 0.35)",
+          "type_match": "Exact type match (score: 1.00)",
+          "pattern_match": "Insufficient sample data (score: 0.50)"
+        }
+      },
+      {
+        "source": "email_address",
+        "target": "purchase_timestamp",
+        "confidence": 0.529,
+        "types": "TEXT \u2192 TEXT",
+        "transformation_required": false,
+        "explanation": {
+          "name_match": "String similarity: 25.81% (score: 0.26)",
+          "type_match": "Exact type match (score: 1.00)",
+          "pattern_match": "Insufficient sample data (score: 0.50)"
+        }
+      },
+      {
+        "source": "phone_number",
+        "target": "purchase_timestamp",
+        "confidence": 0.6,
+        "types": "TEXT \u2192 TEXT",
+        "transformation_required": false,
+        "explanation": {
+          "name_match": "String similarity: 40.00% (score: 0.40)",
+          "type_match": "Exact type match (score: 1.00)",
+          "pattern_match": "Insufficient sample data (score: 0.50)"
+        }
+      },
+      {
+        "source": "registration_date",
+        "target": "purchase_timestamp",
+        "confidence": 0.625,
+        "types": "DATE \u2192 TEXT",
+        "transformation_required": true,
+        "explanation": {
+          "name_match": "Semantic match found: common keywords {'timestamp', 'dt', 'date', 'time'} (score: 0.75)",
+          "type_match": "Compatible (target is TEXT, can hold any data) (score: 0.50)",
+          "pattern_match": "Insufficient sample data (score: 0.50)"
+        }
+      },
+      {
+        "source": "customer_status",
+        "target": "purchase_state",
+        "confidence": 0.721,
+        "types": "TEXT \u2192 TEXT",
+        "transformation_required": false,
+        "explanation": {
+          "name_match": "Semantic match found: common keywords {'state', 'condition', 'status'} (score: 0.64)",
+          "type_match": "Exact type match (score: 1.00)",
+          "pattern_match": "Insufficient sample data (score: 0.50)"
+        }
+      }
+    ],
+    "products\u2192purchases": [
+      {
+        "source": "product_id",
+        "target": "purchase_id",
+        "confidence": 0.686,
+        "types": "INTEGER \u2192 INTEGER",
+        "transformation_required": false,
+        "explanation": {
+          "name_match": "String similarity: 57.14% (score: 0.57)",
+          "type_match": "Exact type match (score: 1.00)",
+          "pattern_match": "Insufficient sample data (score: 0.50)"
+        }
+      },
+      {
+        "source": "product_name",
+        "target": "purchase_state",
+        "confidence": 0.631,
+        "types": "TEXT \u2192 TEXT",
+        "transformation_required": false,
+        "explanation": {
+          "name_match": "String similarity: 46.15% (score: 0.46)",
+          "type_match": "Exact type match (score: 1.00)",
+          "pattern_match": "Insufficient sample data (score: 0.50)"
+        }
+      },
+      {
+        "source": "product_category",
+        "target": "purchase_state",
+        "confidence": 0.633,
+        "types": "TEXT \u2192 TEXT",
+        "transformation_required": false,
+        "explanation": {
+          "name_match": "String similarity: 46.67% (score: 0.47)",
+          "type_match": "Exact type match (score: 1.00)",
+          "pattern_match": "Insufficient sample data (score: 0.50)"
+        }
+      },
+      {
+        "source": "unit_price",
+        "target": "total_cost",
+        "confidence": 0.9,
+        "types": "REAL \u2192 REAL",
+        "transformation_required": false,
+        "explanation": {
+          "name_match": "Semantic match found: common keywords {'amount', 'price', 'cost', 'value'} (score: 1.00)",
+          "type_match": "Exact type match (score: 1.00)",
+          "pattern_match": "Insufficient sample data (score: 0.50)"
+        }
+      },
+      {
+        "source": "stock_quantity",
+        "target": "client_id",
+        "confidence": 0.574,
+        "types": "INTEGER \u2192 INTEGER",
+        "transformation_required": false,
+        "explanation": {
+          "name_match": "String similarity: 34.78% (score: 0.35)",
+          "type_match": "Exact type match (score: 1.00)",
+          "pattern_match": "Insufficient sample data (score: 0.50)"
+        }
+      }
+    ],
+    "order_items\u2192items": [
+      {
+        "source": "item_id",
+        "target": "item_id",
+        "confidence": 0.9,
+        "types": "INTEGER \u2192 INTEGER",
+        "transformation_required": false,
+        "explanation": {
+          "name_match": "Semantic match found: common keywords {'product', 'merchandise', 'item', 'goods'} (score: 1.00)",
+          "type_match": "Exact type match (score: 1.00)",
+          "pattern_match": "Insufficient sample data (score: 0.50)"
+        }
+      },
+      {
+        "source": "order_id",
+        "target": "item_id",
+        "confidence": 0.667,
+        "types": "INTEGER \u2192 INTEGER",
+        "transformation_required": false,
+        "explanation": {
+          "name_match": "String similarity: 53.33% (score: 0.53)",
+          "type_match": "Exact type match (score: 1.00)",
+          "pattern_match": "Insufficient sample data (score: 0.50)"
+        }
+      },
+      {
+        "source": "product_id",
+        "target": "item_id",
+        "confidence": 0.9,
+        "types": "INTEGER \u2192 INTEGER",
+        "transformation_required": false,
+        "explanation": {
+          "name_match": "Semantic match found: common keywords {'product', 'merchandise', 'item', 'goods'} (score: 1.00)",
+          "type_match": "Exact type match (score: 1.00)",
+          "pattern_match": "Insufficient sample data (score: 0.50)"
+        }
+      },
+      {
+        "source": "quantity",
+        "target": "stock_count",
+        "confidence": 0.9,
+        "types": "INTEGER \u2192 INTEGER",
+        "transformation_required": false,
+        "explanation": {
+          "name_match": "Semantic match found: common keywords {'qty', 'quantity', 'count', 'number'} (score: 1.00)",
+          "type_match": "Exact type match (score: 1.00)",
+          "pattern_match": "Insufficient sample data (score: 0.50)"
+        }
+      },
+      {
+        "source": "item_price",
+        "target": "price",
+        "confidence": 0.775,
+        "types": "REAL \u2192 REAL",
+        "transformation_required": false,
+        "explanation": {
+          "name_match": "Semantic match found: common keywords {'amount', 'price', 'cost', 'value'} (score: 0.75)",
+          "type_match": "Exact type match (score: 1.00)",
+          "pattern_match": "Insufficient sample data (score: 0.50)"
+        }
+      }
+    ]
+  },
+  "reverse_mappings": {
+    "purchases\u2192customers": [
+      {
+        "source": "client_id",
+        "target": "customer_id",
+        "reversible": true,
+        "reversibility_reason": "Exact type match - perfect reversibility",
+        "data_loss_risk": false
+      },
+      {
+        "source": "purchase_state",
+        "target": "full_name",
+        "reversible": true,
+        "reversibility_reason": "Exact type match - perfect reversibility",
+        "data_loss_risk": false
+      },
+      {
+        "source": "purchase_timestamp",
+        "target": "email_address",
+        "reversible": true,
+        "reversibility_reason": "Exact type match - perfect reversibility",
+        "data_loss_risk": false
+      },
+      {
+        "source": "purchase_timestamp",
+        "target": "phone_number",
+        "reversible": true,
+        "reversibility_reason": "Exact type match - perfect reversibility",
+        "data_loss_risk": false
+      },
+      {
+        "source": "purchase_timestamp",
+        "target": "registration_date",
+        "reversible": false,
+        "reversibility_reason": "Conversion to TEXT - reverse parse from TEXT to DATE may fail",
+        "data_loss_risk": true
+      },
+      {
+        "source": "purchase_state",
+        "target": "customer_status",
+        "reversible": true,
+        "reversibility_reason": "Exact type match - perfect reversibility",
+        "data_loss_risk": false
+      }
+    ],
+    "purchases\u2192products": [
+      {
+        "source": "purchase_id",
+        "target": "product_id",
+        "reversible": true,
+        "reversibility_reason": "Exact type match - perfect reversibility",
+        "data_loss_risk": false
+      },
+      {
+        "source": "purchase_state",
+        "target": "product_name",
+        "reversible": true,
+        "reversibility_reason": "Exact type match - perfect reversibility",
+        "data_loss_risk": false
+      },
+      {
+        "source": "purchase_state",
+        "target": "product_category",
+        "reversible": true,
+        "reversibility_reason": "Exact type match - perfect reversibility",
+        "data_loss_risk": false
+      },
+      {
+        "source": "total_cost",
+        "target": "unit_price",
+        "reversible": true,
+        "reversibility_reason": "Exact type match - perfect reversibility",
+        "data_loss_risk": false
+      },
+      {
+        "source": "client_id",
+        "target": "stock_quantity",
+        "reversible": true,
+        "reversibility_reason": "Exact type match - perfect reversibility",
+        "data_loss_risk": false
+      }
+    ],
+    "items\u2192order_items": [
+      {
+        "source": "item_id",
+        "target": "item_id",
+        "reversible": true,
+        "reversibility_reason": "Exact type match - perfect reversibility",
+        "data_loss_risk": false
+      },
+      {
+        "source": "item_id",
+        "target": "order_id",
+        "reversible": true,
+        "reversibility_reason": "Exact type match - perfect reversibility",
+        "data_loss_risk": false
+      },
+      {
+        "source": "item_id",
+        "target": "product_id",
+        "reversible": true,
+        "reversibility_reason": "Exact type match - perfect reversibility",
+        "data_loss_risk": false
+      },
+      {
+        "source": "stock_count",
+        "target": "quantity",
+        "reversible": true,
+        "reversibility_reason": "Exact type match - perfect reversibility",
+        "data_loss_risk": false
+      },
+      {
+        "source": "price",
+        "target": "item_price",
+        "reversible": true,
+        "reversibility_reason": "Exact type match - perfect reversibility",
+        "data_loss_risk": false
+      }
+    ]
+  },
+  "summary": {
+    "total_tables": 3,
+    "total_column_mappings": 16,
+    "average_confidence": 0.72,
+    "high_confidence_mappings": 7,
+    "low_confidence_mappings": 0
+  }
+}
