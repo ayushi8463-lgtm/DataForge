@@ -1,0 +1,694 @@
+{
+  "forward_mappings": {
+    "customers\u2192purchases": [
+      {
+        "source_column": "customer_id",
+        "target_column": "purchase_id",
+        "confidence": 0.85,
+        "source_type": "INTEGER",
+        "target_type": "INTEGER",
+        "explanation": {
+          "name_similarity": 0.9,
+          "name_explanation": "Exact match: common keywords {'id'}",
+          "type_compatibility": 1.0,
+          "type_explanation": "Identical types",
+          "pattern_similarity": 0.5,
+          "pattern_explanation": "No specific patterns detected",
+          "total_score": 0.85
+        },
+        "transformation_required": false
+      },
+      {
+        "source_column": "full_name",
+        "target_column": "purchase_state",
+        "confidence": 0.5739130434782609,
+        "source_type": "TEXT",
+        "target_type": "TEXT",
+        "explanation": {
+          "name_similarity": 0.34782608695652173,
+          "name_explanation": "Low similarity",
+          "type_compatibility": 1.0,
+          "type_explanation": "Identical types",
+          "pattern_similarity": 0.5,
+          "pattern_explanation": "No specific patterns detected",
+          "total_score": 0.5739130434782609
+        },
+        "transformation_required": false
+      },
+      {
+        "source_column": "email_address",
+        "target_column": "purchase_state",
+        "confidence": 0.5111111111111111,
+        "source_type": "TEXT",
+        "target_type": "TEXT",
+        "explanation": {
+          "name_similarity": 0.2222222222222222,
+          "name_explanation": "Low similarity",
+          "type_compatibility": 1.0,
+          "type_explanation": "Identical types",
+          "pattern_similarity": 0.5,
+          "pattern_explanation": "No specific patterns detected",
+          "total_score": 0.5111111111111111
+        },
+        "transformation_required": false
+      },
+      {
+        "source_column": "phone_number",
+        "target_column": "purchase_timestamp",
+        "confidence": 0.6,
+        "source_type": "TEXT",
+        "target_type": "TEXT",
+        "explanation": {
+          "name_similarity": 0.4,
+          "name_explanation": "Low similarity",
+          "type_compatibility": 1.0,
+          "type_explanation": "Identical types",
+          "pattern_similarity": 0.5,
+          "pattern_explanation": "No specific patterns detected",
+          "total_score": 0.6
+        },
+        "transformation_required": false
+      },
+      {
+        "source_column": "registration_date",
+        "target_column": "purchase_timestamp",
+        "confidence": 0.625,
+        "source_type": "DATE",
+        "target_type": "TEXT",
+        "explanation": {
+          "name_similarity": 0.75,
+          "name_explanation": "Semantic match: common keywords {'timestamp', 'datetime', 'date', 'time'}",
+          "type_compatibility": 0.5,
+          "type_explanation": "Generic conversion: DATE \u2192 TEXT",
+          "pattern_similarity": 0.5,
+          "pattern_explanation": "No specific patterns detected",
+          "total_score": 0.625
+        },
+        "transformation_required": true
+      },
+      {
+        "source_column": "customer_status",
+        "target_column": "purchase_state",
+        "confidence": 0.775,
+        "source_type": "TEXT",
+        "target_type": "TEXT",
+        "explanation": {
+          "name_similarity": 0.75,
+          "name_explanation": "Semantic match: common keywords {'state', 'status', 'condition'}",
+          "type_compatibility": 1.0,
+          "type_explanation": "Identical types",
+          "pattern_similarity": 0.5,
+          "pattern_explanation": "No specific patterns detected",
+          "total_score": 0.775
+        },
+        "transformation_required": false
+      }
+    ],
+    "products\u2192purchases": [
+      {
+        "source_column": "product_id",
+        "target_column": "purchase_id",
+        "confidence": 0.85,
+        "source_type": "INTEGER",
+        "target_type": "INTEGER",
+        "explanation": {
+          "name_similarity": 0.9,
+          "name_explanation": "Exact match: common keywords {'id'}",
+          "type_compatibility": 1.0,
+          "type_explanation": "Identical types",
+          "pattern_similarity": 0.5,
+          "pattern_explanation": "No specific patterns detected",
+          "total_score": 0.85
+        },
+        "transformation_required": false
+      },
+      {
+        "source_column": "product_name",
+        "target_column": "purchase_state",
+        "confidence": 0.6307692307692307,
+        "source_type": "TEXT",
+        "target_type": "TEXT",
+        "explanation": {
+          "name_similarity": 0.46153846153846156,
+          "name_explanation": "Low similarity",
+          "type_compatibility": 1.0,
+          "type_explanation": "Identical types",
+          "pattern_similarity": 0.5,
+          "pattern_explanation": "No specific patterns detected",
+          "total_score": 0.6307692307692307
+        },
+        "transformation_required": false
+      },
+      {
+        "source_column": "product_category",
+        "target_column": "purchase_state",
+        "confidence": 0.6333333333333333,
+        "source_type": "TEXT",
+        "target_type": "TEXT",
+        "explanation": {
+          "name_similarity": 0.4666666666666667,
+          "name_explanation": "Low similarity",
+          "type_compatibility": 1.0,
+          "type_explanation": "Identical types",
+          "pattern_similarity": 0.5,
+          "pattern_explanation": "No specific patterns detected",
+          "total_score": 0.6333333333333333
+        },
+        "transformation_required": false
+      },
+      {
+        "source_column": "unit_price",
+        "target_column": "total_cost",
+        "confidence": 0.775,
+        "source_type": "REAL",
+        "target_type": "REAL",
+        "explanation": {
+          "name_similarity": 0.75,
+          "name_explanation": "Semantic match: common keywords {'cost', 'sum', 'amount', 'price', 'total'}",
+          "type_compatibility": 1.0,
+          "type_explanation": "Identical types",
+          "pattern_similarity": 0.5,
+          "pattern_explanation": "No specific patterns detected",
+          "total_score": 0.775
+        },
+        "transformation_required": false
+      },
+      {
+        "source_column": "stock_quantity",
+        "target_column": "client_id",
+        "confidence": 0.5739130434782609,
+        "source_type": "INTEGER",
+        "target_type": "INTEGER",
+        "explanation": {
+          "name_similarity": 0.34782608695652173,
+          "name_explanation": "Low similarity",
+          "type_compatibility": 1.0,
+          "type_explanation": "Identical types",
+          "pattern_similarity": 0.5,
+          "pattern_explanation": "No specific patterns detected",
+          "total_score": 0.5739130434782609
+        },
+        "transformation_required": false
+      }
+    ],
+    "order_items\u2192items": [
+      {
+        "source_column": "item_id",
+        "target_column": "item_id",
+        "confidence": 0.85,
+        "source_type": "INTEGER",
+        "target_type": "INTEGER",
+        "explanation": {
+          "name_similarity": 0.9,
+          "name_explanation": "Exact match: common keywords {'id', 'item'}",
+          "type_compatibility": 1.0,
+          "type_explanation": "Identical types",
+          "pattern_similarity": 0.5,
+          "pattern_explanation": "Insufficient sample data",
+          "total_score": 0.85
+        },
+        "transformation_required": false
+      },
+      {
+        "source_column": "order_id",
+        "target_column": "item_id",
+        "confidence": 0.85,
+        "source_type": "INTEGER",
+        "target_type": "INTEGER",
+        "explanation": {
+          "name_similarity": 0.9,
+          "name_explanation": "Exact match: common keywords {'id'}",
+          "type_compatibility": 1.0,
+          "type_explanation": "Identical types",
+          "pattern_similarity": 0.5,
+          "pattern_explanation": "Insufficient sample data",
+          "total_score": 0.85
+        },
+        "transformation_required": false
+      },
+      {
+        "source_column": "product_id",
+        "target_column": "item_id",
+        "confidence": 0.85,
+        "source_type": "INTEGER",
+        "target_type": "INTEGER",
+        "explanation": {
+          "name_similarity": 0.9,
+          "name_explanation": "Exact match: common keywords {'id'}",
+          "type_compatibility": 1.0,
+          "type_explanation": "Identical types",
+          "pattern_similarity": 0.5,
+          "pattern_explanation": "Insufficient sample data",
+          "total_score": 0.85
+        },
+        "transformation_required": false
+      },
+      {
+        "source_column": "quantity",
+        "target_column": "stock_count",
+        "confidence": 0.775,
+        "source_type": "INTEGER",
+        "target_type": "INTEGER",
+        "explanation": {
+          "name_similarity": 0.75,
+          "name_explanation": "Semantic match: common keywords {'count', 'qty', 'quantity'}",
+          "type_compatibility": 1.0,
+          "type_explanation": "Identical types",
+          "pattern_similarity": 0.5,
+          "pattern_explanation": "Insufficient sample data",
+          "total_score": 0.775
+        },
+        "transformation_required": false
+      },
+      {
+        "source_column": "item_price",
+        "target_column": "price",
+        "confidence": 0.85,
+        "source_type": "REAL",
+        "target_type": "REAL",
+        "explanation": {
+          "name_similarity": 0.9,
+          "name_explanation": "Exact match: common keywords {'price'}",
+          "type_compatibility": 1.0,
+          "type_explanation": "Identical types",
+          "pattern_similarity": 0.5,
+          "pattern_explanation": "Insufficient sample data",
+          "total_score": 0.85
+        },
+        "transformation_required": false
+      }
+    ]
+  },
+  "reverse_mappings": {
+    "purchases\u2192products": [
+      {
+        "source_column": "purchase_id",
+        "target_column": "product_id",
+        "confidence": 0.85,
+        "source_type": "INTEGER",
+        "target_type": "INTEGER",
+        "explanation": {
+          "name_similarity": 0.9,
+          "name_explanation": "Exact match: common keywords {'id'}",
+          "type_compatibility": 1.0,
+          "type_explanation": "Identical types",
+          "pattern_similarity": 0.5,
+          "pattern_explanation": "No specific patterns detected",
+          "total_score": 0.85
+        },
+        "transformation_required": false
+      },
+      {
+        "source_column": "client_id",
+        "target_column": "product_id",
+        "confidence": 0.85,
+        "source_type": "INTEGER",
+        "target_type": "INTEGER",
+        "explanation": {
+          "name_similarity": 0.9,
+          "name_explanation": "Exact match: common keywords {'id'}",
+          "type_compatibility": 1.0,
+          "type_explanation": "Identical types",
+          "pattern_similarity": 0.5,
+          "pattern_explanation": "No specific patterns detected",
+          "total_score": 0.85
+        },
+        "transformation_required": false
+      },
+      {
+        "source_column": "purchase_timestamp",
+        "target_column": "product_name",
+        "confidence": 0.6,
+        "source_type": "TEXT",
+        "target_type": "TEXT",
+        "explanation": {
+          "name_similarity": 0.4,
+          "name_explanation": "Low similarity",
+          "type_compatibility": 1.0,
+          "type_explanation": "Identical types",
+          "pattern_similarity": 0.5,
+          "pattern_explanation": "No specific patterns detected",
+          "total_score": 0.6
+        },
+        "transformation_required": false
+      },
+      {
+        "source_column": "total_cost",
+        "target_column": "unit_price",
+        "confidence": 0.775,
+        "source_type": "REAL",
+        "target_type": "REAL",
+        "explanation": {
+          "name_similarity": 0.75,
+          "name_explanation": "Semantic match: common keywords {'cost', 'sum', 'amount', 'price', 'total'}",
+          "type_compatibility": 1.0,
+          "type_explanation": "Identical types",
+          "pattern_similarity": 0.5,
+          "pattern_explanation": "No specific patterns detected",
+          "total_score": 0.775
+        },
+        "transformation_required": false
+      },
+      {
+        "source_column": "purchase_state",
+        "target_column": "product_category",
+        "confidence": 0.6333333333333333,
+        "source_type": "TEXT",
+        "target_type": "TEXT",
+        "explanation": {
+          "name_similarity": 0.4666666666666667,
+          "name_explanation": "Low similarity",
+          "type_compatibility": 1.0,
+          "type_explanation": "Identical types",
+          "pattern_similarity": 0.5,
+          "pattern_explanation": "No specific patterns detected",
+          "total_score": 0.6333333333333333
+        },
+        "transformation_required": false
+      }
+    ],
+    "items\u2192order_items": [
+      {
+        "source_column": "item_id",
+        "target_column": "item_id",
+        "confidence": 0.85,
+        "source_type": "INTEGER",
+        "target_type": "INTEGER",
+        "explanation": {
+          "name_similarity": 0.9,
+          "name_explanation": "Exact match: common keywords {'id', 'item'}",
+          "type_compatibility": 1.0,
+          "type_explanation": "Identical types",
+          "pattern_similarity": 0.5,
+          "pattern_explanation": "Insufficient sample data",
+          "total_score": 0.85
+        },
+        "transformation_required": false
+      },
+      {
+        "source_column": "item_name",
+        "target_column": "item_id",
+        "confidence": 0.64,
+        "source_type": "TEXT",
+        "target_type": "INTEGER",
+        "explanation": {
+          "name_similarity": 0.9,
+          "name_explanation": "Exact match: common keywords {'item'}",
+          "type_compatibility": 0.3,
+          "type_explanation": "Incompatible types: TEXT \u2194 INTEGER",
+          "pattern_similarity": 0.5,
+          "pattern_explanation": "Insufficient sample data",
+          "total_score": 0.64
+        },
+        "transformation_required": true
+      },
+      {
+        "source_column": "item_category",
+        "target_column": "item_id",
+        "confidence": 0.64,
+        "source_type": "TEXT",
+        "target_type": "INTEGER",
+        "explanation": {
+          "name_similarity": 0.9,
+          "name_explanation": "Exact match: common keywords {'item'}",
+          "type_compatibility": 0.3,
+          "type_explanation": "Incompatible types: TEXT \u2194 INTEGER",
+          "pattern_similarity": 0.5,
+          "pattern_explanation": "Insufficient sample data",
+          "total_score": 0.64
+        },
+        "transformation_required": true
+      },
+      {
+        "source_column": "price",
+        "target_column": "item_price",
+        "confidence": 0.85,
+        "source_type": "REAL",
+        "target_type": "REAL",
+        "explanation": {
+          "name_similarity": 0.9,
+          "name_explanation": "Exact match: common keywords {'price'}",
+          "type_compatibility": 1.0,
+          "type_explanation": "Identical types",
+          "pattern_similarity": 0.5,
+          "pattern_explanation": "Insufficient sample data",
+          "total_score": 0.85
+        },
+        "transformation_required": false
+      },
+      {
+        "source_column": "stock_count",
+        "target_column": "quantity",
+        "confidence": 0.775,
+        "source_type": "INTEGER",
+        "target_type": "INTEGER",
+        "explanation": {
+          "name_similarity": 0.75,
+          "name_explanation": "Semantic match: common keywords {'count', 'qty', 'quantity'}",
+          "type_compatibility": 1.0,
+          "type_explanation": "Identical types",
+          "pattern_similarity": 0.5,
+          "pattern_explanation": "Insufficient sample data",
+          "total_score": 0.775
+        },
+        "transformation_required": false
+      }
+    ]
+  },
+  "comparison_results": {
+    "products": {
+      "column_comparisons": {
+        "product_id": {
+          "status": "DATA_LOSS",
+          "confidence": 0.0,
+          "match_percentage": 0.0,
+          "matches": 0,
+          "total": 50,
+          "reason": "0.0% match - Significant data loss"
+        },
+        "product_name": {
+          "status": "DATA_LOSS",
+          "confidence": 0.0,
+          "match_percentage": 0.0,
+          "matches": 0,
+          "total": 50,
+          "reason": "0.0% match - Significant data loss"
+        },
+        "product_category": {
+          "status": "PERFECT_MATCH",
+          "confidence": 1.0,
+          "match_percentage": 100.0,
+          "matches": 50,
+          "total": 50,
+          "reason": "100% match - Perfect round-trip"
+        },
+        "unit_price": {
+          "status": "PERFECT_MATCH",
+          "confidence": 1.0,
+          "match_percentage": 100.0,
+          "matches": 50,
+          "total": 50,
+          "reason": "100% match - Perfect round-trip"
+        },
+        "stock_quantity": {
+          "status": "NOT_MAPPED",
+          "confidence": 0.0,
+          "match_percentage": 0.0,
+          "reason": "Column not present in derived data"
+        }
+      },
+      "overall_confidence": 0.4
+    },
+    "order_items": {
+      "column_comparisons": {
+        "item_id": {
+          "status": "DATA_LOSS",
+          "confidence": 0.0,
+          "match_percentage": 0.0,
+          "matches": 0,
+          "total": 50,
+          "reason": "0.0% match - Significant data loss"
+        },
+        "order_id": {
+          "status": "NOT_MAPPED",
+          "confidence": 0.0,
+          "match_percentage": 0.0,
+          "reason": "Column not present in derived data"
+        },
+        "product_id": {
+          "status": "NOT_MAPPED",
+          "confidence": 0.0,
+          "match_percentage": 0.0,
+          "reason": "Column not present in derived data"
+        },
+        "quantity": {
+          "status": "PERFECT_MATCH",
+          "confidence": 1.0,
+          "match_percentage": 100.0,
+          "matches": 50,
+          "total": 50,
+          "reason": "100% match - Perfect round-trip"
+        },
+        "item_price": {
+          "status": "PERFECT_MATCH",
+          "confidence": 1.0,
+          "match_percentage": 100.0,
+          "matches": 50,
+          "total": 50,
+          "reason": "100% match - Perfect round-trip"
+        }
+      },
+      "overall_confidence": 0.4
+    }
+  },
+  "refined_mappings": {
+    "products\u2192purchases": [
+      {
+        "source_column": "product_category",
+        "target_column": "purchase_state",
+        "confidence": 0.6333333333333333,
+        "source_type": "TEXT",
+        "target_type": "TEXT",
+        "explanation": {
+          "name_similarity": 0.4666666666666667,
+          "name_explanation": "Low similarity",
+          "type_compatibility": 1.0,
+          "type_explanation": "Identical types",
+          "pattern_similarity": 0.5,
+          "pattern_explanation": "No specific patterns detected",
+          "total_score": 0.6333333333333333
+        },
+        "transformation_required": false,
+        "refined_confidence": 1.0,
+        "refinement_reason": "100% round-trip match - Confirmed"
+      },
+      {
+        "source_column": "unit_price",
+        "target_column": "total_cost",
+        "confidence": 0.775,
+        "source_type": "REAL",
+        "target_type": "REAL",
+        "explanation": {
+          "name_similarity": 0.75,
+          "name_explanation": "Semantic match: common keywords {'cost', 'sum', 'amount', 'price', 'total'}",
+          "type_compatibility": 1.0,
+          "type_explanation": "Identical types",
+          "pattern_similarity": 0.5,
+          "pattern_explanation": "No specific patterns detected",
+          "total_score": 0.775
+        },
+        "transformation_required": false,
+        "refined_confidence": 1.0,
+        "refinement_reason": "100% round-trip match - Confirmed"
+      },
+      {
+        "source_column": "product_id",
+        "target_column": "purchase_id",
+        "confidence": 0.9400000000000001,
+        "refined_confidence": 0.9400000000000001,
+        "source_type": "INTEGER",
+        "target_type": "INTEGER",
+        "refinement_reason": "Re-mapped after round-trip validation (original had 0.0% match)",
+        "transformation_required": false
+      },
+      {
+        "source_column": "product_name",
+        "target_column": "purchase_timestamp",
+        "confidence": 0.64,
+        "refined_confidence": 0.64,
+        "source_type": "TEXT",
+        "target_type": "TEXT",
+        "refinement_reason": "Re-mapped after round-trip validation (original had 0.0% match)",
+        "transformation_required": false
+      },
+      {
+        "source_column": "stock_quantity",
+        "target_column": "client_id",
+        "confidence": 0.6086956521739131,
+        "refined_confidence": 0.6086956521739131,
+        "source_type": "INTEGER",
+        "target_type": "INTEGER",
+        "refinement_reason": "Re-mapped after round-trip validation (original had 0.0% match)",
+        "transformation_required": false
+      }
+    ],
+    "order_items\u2192items": [
+      {
+        "source_column": "quantity",
+        "target_column": "stock_count",
+        "confidence": 0.775,
+        "source_type": "INTEGER",
+        "target_type": "INTEGER",
+        "explanation": {
+          "name_similarity": 0.75,
+          "name_explanation": "Semantic match: common keywords {'count', 'qty', 'quantity'}",
+          "type_compatibility": 1.0,
+          "type_explanation": "Identical types",
+          "pattern_similarity": 0.5,
+          "pattern_explanation": "Insufficient sample data",
+          "total_score": 0.775
+        },
+        "transformation_required": false,
+        "refined_confidence": 1.0,
+        "refinement_reason": "100% round-trip match - Confirmed"
+      },
+      {
+        "source_column": "item_price",
+        "target_column": "price",
+        "confidence": 0.85,
+        "source_type": "REAL",
+        "target_type": "REAL",
+        "explanation": {
+          "name_similarity": 0.9,
+          "name_explanation": "Exact match: common keywords {'price'}",
+          "type_compatibility": 1.0,
+          "type_explanation": "Identical types",
+          "pattern_similarity": 0.5,
+          "pattern_explanation": "Insufficient sample data",
+          "total_score": 0.85
+        },
+        "transformation_required": false,
+        "refined_confidence": 1.0,
+        "refinement_reason": "100% round-trip match - Confirmed"
+      },
+      {
+        "source_column": "item_id",
+        "target_column": "item_id",
+        "confidence": 0.9400000000000001,
+        "refined_confidence": 0.9400000000000001,
+        "source_type": "INTEGER",
+        "target_type": "INTEGER",
+        "refinement_reason": "Re-mapped after round-trip validation (original had 0.0% match)",
+        "transformation_required": false
+      },
+      {
+        "source_column": "order_id",
+        "target_column": "item_id",
+        "confidence": 0.9400000000000001,
+        "refined_confidence": 0.9400000000000001,
+        "source_type": "INTEGER",
+        "target_type": "INTEGER",
+        "refinement_reason": "Re-mapped after round-trip validation (original had 0.0% match)",
+        "transformation_required": false
+      },
+      {
+        "source_column": "product_id",
+        "target_column": "item_id",
+        "confidence": 0.9400000000000001,
+        "refined_confidence": 0.9400000000000001,
+        "source_type": "INTEGER",
+        "target_type": "INTEGER",
+        "refinement_reason": "Re-mapped after round-trip validation (original had 0.0% match)",
+        "transformation_required": false
+      }
+    ]
+  },
+  "summary": {
+    "total_columns_analyzed": 10,
+    "perfect_round_trip_matches": 4,
+    "perfect_match_percentage": 40.0,
+    "improved_mappings": 6,
+    "discarded_mappings": 0,
+    "overall_confidence": 0.4
+  }
+}
