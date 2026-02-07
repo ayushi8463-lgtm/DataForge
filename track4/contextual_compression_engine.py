@@ -436,40 +436,188 @@ class HierarchicalCompressor:
         
         # Load summarization model with better error handling
         self.summarizer = None
+        self.summarizer_type = None
         print("Loading summarization model (this may take 1-2 minutes)...")
         
-        # Try different models in order of preference
+        # Try different models with different task names (compatibility across transformers versions)
+        # Format: (model_name, display_name, task_type)
         models_to_try = [
-            ("facebook/bart-large-cnn", "BART-large"),
-            ("sshleifer/distilbart-cnn-12-6", "DistilBART"),
-            ("t5-small", "T5-small")
+            ("sshleifer/distilbart-cnn-12-6", "DistilBART", "summarization"),
+            ("facebook/bart-large-cnn", "BART-large", "summarization"),
+            ("philschmid/bart-large-cnn-samsum", "BART-samsum", "summarization"),
         ]
         
-        for model_name, display_name in models_to_try:
+        # Also try with text2text-generation task (for newer/different transformers versions)
+        alt_models = [
+            ("sshleifer/distilbart-cnn-12-6", "DistilBART-t2t", "text2text-generation"),
+            ("facebook/bart-large-cnn", "BART-large-t2t", "text2text-generation"),
+        ]
+        
+        device = 0 if use_gpu else -1
+        
+        # Try with summarization task first
+        for model_name, display_name, task in models_to_try:
             try:
                 print(f"  Attempting to load {display_name}...")
                 self.summarizer = pipeline(
-                    "summarization", 
+                    task, 
                     model=model_name,
-                    device=0 if use_gpu else -1,
-                    framework="pt"
+                    device=device
                 )
+                self.summarizer_type = display_name
+                self.summarizer_task = task
                 print(f"✓ Successfully loaded {display_name}")
                 break
             except Exception as e:
-                print(f"  ✗ Failed to load {display_name}: {str(e)[:100]}")
+                error_msg = str(e)
+                if "Unknown task" in error_msg:
+                    # Try alternative task names
+                    continue
+                elif len(error_msg) > 100:
+                    error_msg = error_msg[:100] + "..."
+                print(f"  ✗ Failed: {error_msg}")
                 continue
+        
+        # If summarization task didn't work, try text2text-generation
+        if self.summarizer is None:
+            print("  Trying alternative task type (text2text-generation)...")
+            for model_name, display_name, task in alt_models:
+                try:
+                    print(f"  Attempting to load {display_name}...")
+                    self.summarizer = pipeline(
+                        task, 
+                        model=model_name,
+                        device=device
+                    )
+                    self.summarizer_type = display_name
+                    self.summarizer_task = task
+                    print(f"✓ Successfully loaded {display_name}")
+                    break
+                except Exception as e:
+                    error_msg = str(e)
+                    if len(error_msg) > 100:
+                        error_msg = error_msg[:100] + "..."
+                    print(f"  ✗ Failed: {error_msg}")
+                    continue
+        
+        # Final fallback: try loading model directly without pipeline
+        if self.summarizer is None:
+            try:
+                print("  Trying direct model loading...")
+                from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+                
+                model_name = "sshleifer/distilbart-cnn-12-6"
+                tokenizer = AutoTokenizer.from_pretrained(model_name)
+                model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
+                
+                # Create custom summarizer function
+                def custom_summarize(text, max_length=150, min_length=30):
+                    inputs = tokenizer(text, return_tensors="pt", max_length=1024, truncation=True)
+                    summary_ids = model.generate(inputs["input_ids"], max_length=max_length, min_length=min_length, num_beams=4, early_stopping=True)
+                    return [{"summary_text": tokenizer.decode(summary_ids[0], skip_special_tokens=True)}]
+                
+                self.summarizer = custom_summarize
+                self.summarizer_type = "DistilBART-direct"
+                self.summarizer_task = "custom"
+                print("✓ Successfully loaded model directly")
+                
+            except Exception as e:
+                print(f"  ✗ Direct loading also failed: {str(e)[:100]}")
         
         if self.summarizer is None:
             print("\n⚠ Warning: Could not load any summarization model.")
             print("  Falling back to GETS extractive summarization.")
             print("  This will still work but summaries will be extractive rather than abstractive.")
-            print("\nTo fix this issue:")
-            print("  1. Ensure you have internet connection for model download")
-            print("  2. Install: pip install transformers torch")
-            print("  3. For GPU support: pip install transformers torch torchvision")
+            print("\n💡 Common causes:")
+            print("  - Incompatible transformers version (try: pip install --upgrade transformers)")
+            print("  - No internet connection (models need to download on first run)")
+            print("  - Insufficient memory (try restarting runtime)")
+            print("\n✓ System will continue with extractive summarization (still fully functional)")
+            self.summarizer_type = "GETS-Extractive"
+            self.summarizer_task = "extractive"
         else:
-            print("✓ Summarization model ready")
+            print(f"✓ Summarization model ready ({self.summarizer_type})")
+    
+    def test_setup(self):
+        """Test that all components are working properly"""
+        print("="*70)
+        print("TESTING SYSTEM SETUP")
+        print("="*70)
+        
+        results = {
+            'critical_extractor': False,
+            'gets_extractor': False,
+            'contradiction_detector': False,
+            'summarizer': False
+        }
+        
+        # Test critical content extractor
+        try:
+            test_text = "The maximum limit is 500 units per day, except on holidays."
+            test_source = SourceReference(page=1, paragraph_idx=0, original_text=test_text)
+            facts = self.critical_extractor.extract_from_text(test_text, test_source)
+            if len(facts) > 0:
+                results['critical_extractor'] = True
+                print(f"✓ Critical Content Extractor: Working ({len(facts)} facts extracted)")
+            else:
+                print("⚠ Critical Content Extractor: No facts extracted (may need tuning)")
+        except Exception as e:
+            print(f"✗ Critical Content Extractor: Error - {e}")
+        
+        # Test GETS extractor
+        try:
+            test_text = "First sentence. Second sentence with content. Third sentence here."
+            test_source = SourceReference(page=1, paragraph_idx=0, original_text=test_text)
+            sentences = self.gets_extractor.extract_key_sentences(test_text, num_sentences=2, source=test_source)
+            if len(sentences) > 0:
+                results['gets_extractor'] = True
+                print(f"✓ GETS Extractor: Working ({len(sentences)} sentences extracted)")
+            else:
+                print("⚠ GETS Extractor: No sentences extracted")
+        except Exception as e:
+            print(f"✗ GETS Extractor: Error - {e}")
+        
+        # Test contradiction detector
+        try:
+            test_statements = [
+                {'text': 'Policy A allows 5 days leave', 'source': SourceReference(page=1, paragraph_idx=0)},
+                {'text': 'Policy B allows 3 days leave', 'source': SourceReference(page=2, paragraph_idx=0)}
+            ]
+            contradictions = self.contradiction_detector.detect_contradictions(test_statements)
+            results['contradiction_detector'] = True
+            print(f"✓ Contradiction Detector: Working ({len(contradictions)} contradictions found)")
+        except Exception as e:
+            print(f"✗ Contradiction Detector: Error - {e}")
+        
+        # Test summarizer
+        if self.summarizer is not None:
+            try:
+                test_text = "This is a test document. It contains multiple sentences. We want to test if the summarization model works properly. This is important for the compression engine."
+                summary = self._generate_summary(test_text, max_length=50)
+                if summary:
+                    results['summarizer'] = True
+                    print(f"✓ Summarizer ({self.summarizer_type}): Working")
+                else:
+                    print("⚠ Summarizer: Generated empty summary")
+            except Exception as e:
+                print(f"✗ Summarizer: Error - {e}")
+        else:
+            results['summarizer'] = True  # Extractive fallback is OK
+            print(f"✓ Summarizer (GETS-Extractive fallback): Working")
+        
+        print("="*70)
+        all_working = all(results.values())
+        if all_working:
+            print("✓ ALL SYSTEMS OPERATIONAL")
+            print("  Ready to process documents!")
+        else:
+            print("⚠ SOME ISSUES DETECTED")
+            print("  System will work but some features may be limited")
+            failed = [k for k, v in results.items() if not v]
+            print(f"  Failed components: {', '.join(failed)}")
+        print("="*70)
+        
+        return all_working
     
     def extract_text_from_pdf(self, pdf_path: str) -> List[Dict[str, Any]]:
         """Extract text from PDF with paragraph-level granularity"""
@@ -700,13 +848,23 @@ class HierarchicalCompressor:
                 text = ' '.join(words[:1000])
             
             min_length = max(30, max_length // 3)
-            summary = self.summarizer(
-                text, 
-                max_length=max_length, 
-                min_length=min_length, 
-                do_sample=False,
-                truncation=True
-            )
+            
+            # Handle different summarizer types
+            if self.summarizer_task == "custom":
+                # Custom direct model loading
+                summary = self.summarizer(text, max_length=max_length, min_length=min_length)
+            elif self.summarizer_task in ["summarization", "text2text-generation"]:
+                # Pipeline summarizer
+                summary = self.summarizer(
+                    text, 
+                    max_length=max_length, 
+                    min_length=min_length, 
+                    do_sample=False,
+                    truncation=True
+                )
+            else:
+                raise ValueError(f"Unknown summarizer task: {self.summarizer_task}")
+            
             return summary[0]['summary_text']
             
         except Exception as e:
