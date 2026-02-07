@@ -254,10 +254,10 @@ def create_target_database(db_path: str):
 
 def create_databases():
     """Create both source and target databases"""
-    source_db = '/Users/ayushigupta/Documents/GitHub/DataForge/track2/outputs/source_database.db'
-    target_db = '/Users/ayushigupta/Documents/GitHub/DataForge/track2/outputs/target_database.db'
-    
-    print("="*80)
+    source_db = 'outputs/source_database.db'
+    target_db = 'outputs/target_database.db'
+
+    print("=" * 80)
     print("Creating Synthetic Databases for Migration Testing")
     print("=" * 80)
     print()

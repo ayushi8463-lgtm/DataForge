@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Enhanced Round-Trip Migration Report</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 15px;
+        }
+        h2 {
+            color: #444;
+            margin-top: 30px;
+            border-left: 5px solid #667eea;
+            padding-left: 15px;
+        }
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .metric-value {
+            font-size: 36px;
+            font-weight: bold;
+        }
+        .metric-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+        th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        tr:hover {
+            background: #f5f5f5;
+        }
+        .perfect { color: #00cc00; font-weight: bold; }
+        .partial { color: #ff9900; font-weight: bold; }
+        .poor { color: #ff0000; font-weight: bold; }
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .badge-perfect { background: #00cc00; color: white; }
+        .badge-partial { background: #ff9900; color: white; }
+        .badge-poor { background: #ff0000; color: white; }
+        .section {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .iteration-box {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #667eea;
+            border-radius: 4px;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00cc00, #00ff00);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 Enhanced Round-Trip Migration Report</h1>
+        <p style="text-align: center; color: #666; font-size: 16px;">
+            Source → Target → Reconstructed Source → Comparison & Iterative Re-mapping
+        </p>
+
+        <div class="metric-grid">
+            <div class="metric-card">
+                <div class="metric-value">4</div>
+                <div class="metric-label">Tables Compared</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">1</div>
+                <div class="metric-label">Perfect Matches (100%)</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">0</div>
+                <div class="metric-label">Partial Matches (80-99%)</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">20</div>
+                <div class="metric-label">Poor Matches (<80%)</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>Overall Match Quality</h3>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 4.761904761904762%">4.8% Perfect</div>
+            </div>
+        </div>
+<h2>📊 Detailed Column-by-Column Comparison</h2><div class="section"><h3>Table: customers</h3><p><strong>Perfect Matches:</strong> 0 / 6 columns</p><table><thead><tr><th>Column</th><th>Status</th><th>Confidence</th><th>Match %</th><th>Matched Rows</th></tr></thead><tbody><tr><td><strong>customer_id</strong></td><td><span class="status-badge badge-poor">POOR_MATCH</span></td><td class="poor">0.0%</td><td>0.0%</td><td>0 / 100</td></tr><tr><td><strong>full_name</strong></td><td><span class="status-badge badge-poor">POOR_MATCH</span></td><td class="poor">0.0%</td><td>0.0%</td><td>0 / 100</td></tr><tr><td><strong>email_address</strong></td><td><span class="status-badge badge-poor">POOR_MATCH</span></td><td class="poor">0.0%</td><td>0.0%</td><td>0 / 100</td></tr><tr><td><strong>phone_number</strong></td><td><span class="status-badge badge-poor">POOR_MATCH</span></td><td class="poor">0.0%</td><td>0.0%</td><td>0 / 100</td></tr><tr><td><strong>registration_date</strong></td><td><span class="status-badge badge-poor">POOR_MATCH</span></td><td class="poor">0.0%</td><td>0.0%</td><td>0 / 100</td></tr><tr><td><strong>customer_status</strong></td><td><span class="status-badge badge-poor">POOR_MATCH</span></td><td class="poor">0.0%</td><td>0.0%</td><td>0 / 100</td></tr></tbody></table></div><div class="section"><h3>Table: orders</h3><p><strong>Perfect Matches:</strong> 0 / 5 columns</p><table><thead><tr><th>Column</th><th>Status</th><th>Confidence</th><th>Match %</th><th>Matched Rows</th></tr></thead><tbody><tr><td><strong>order_id</strong></td><td><span class="status-badge badge-poor">POOR_MATCH</span></td><td class="poor">0.0%</td><td>0.0%</td><td>0 / 200</td></tr><tr><td><strong>customer_id</strong></td><td><span class="status-badge badge-poor">POOR_MATCH</span></td><td class="poor">0.0%</td><td>0.0%</td><td>0 / 200</td></tr><tr><td><strong>order_date</strong></td><td><span class="status-badge badge-poor">POOR_MATCH</span></td><td class="poor">0.0%</td><td>0.0%</td><td>0 / 200</td></tr><tr><td><strong>total_amount</strong></td><td><span class="status-badge badge-poor">POOR_MATCH</span></td><td class="poor">0.0%</td><td>0.0%</td><td>0 / 200</td></tr><tr><td><strong>order_status</strong></td><td><span class="status-badge badge-poor">POOR_MATCH</span></td><td class="poor">0.0%</td><td>0.0%</td><td>0 / 200</td></tr></tbody></table></div><div class="section"><h3>Table: products</h3><p><strong>Perfect Matches:</strong> 1 / 5 columns</p><table><thead><tr><th>Column</th><th>Status</th><th>Confidence</th><th>Match %</th><th>Matched Rows</th></tr></thead><tbody><tr><td><strong>product_id</strong></td><td><span class="status-badge badge-perfect">PERFECT_MATCH</span></td><td class="perfect">100.0%</td><td>100.0%</td><td>50 / 50</td></tr><tr><td><strong>product_name</strong></td><td><span class="status-badge badge-poor">POOR_MATCH</span></td><td class="poor">0.0%</td><td>0.0%</td><td>0 / 50</td></tr><tr><td><strong>product_category</strong></td><td><span class="status-badge badge-poor">POOR_MATCH</span></td><td class="poor">0.0%</td><td>0.0%</td><td>0 / 50</td></tr><tr><td><strong>unit_price</strong></td><td><span class="status-badge badge-poor">POOR_MATCH</span></td><td class="poor">0.0%</td><td>0.0%</td><td>0 / 50</td></tr><tr><td><strong>stock_quantity</strong></td><td><span class="status-badge badge-poor">POOR_MATCH</span></td><td class="poor">0.0%</td><td>0.0%</td><td>0 / 50</td></tr></tbody></table></div><div class="section"><h3>Table: order_items</h3><p><strong>Perfect Matches:</strong> 0 / 5 columns</p><table><thead><tr><th>Column</th><th>Status</th><th>Confidence</th><th>Match %</th><th>Matched Rows</th></tr></thead><tbody><tr><td><strong>item_id</strong></td><td><span class="status-badge badge-poor">POOR_MATCH</span></td><td class="poor">0.0%</td><td>0.0%</td><td>0 / 633</td></tr><tr><td><strong>order_id</strong></td><td><span class="status-badge badge-poor">POOR_MATCH</span></td><td class="poor">0.0%</td><td>0.0%</td><td>0 / 633</td></tr><tr><td><strong>product_id</strong></td><td><span class="status-badge badge-poor">POOR_MATCH</span></td><td class="poor">0.0%</td><td>0.0%</td><td>0 / 633</td></tr><tr><td><strong>quantity</strong></td><td><span class="status-badge badge-poor">POOR_MATCH</span></td><td class="poor">0.0%</td><td>0.0%</td><td>0 / 633</td></tr><tr><td><strong>item_price</strong></td><td><span class="status-badge badge-poor">POOR_MATCH</span></td><td class="poor">0.0%</td><td>0.0%</td><td>0 / 633</td></tr></tbody></table></div><h2>🔄 Iterative Re-mapping Results</h2><div class="section"><div class="iteration-box"><h4>Iteration 1</h4><p><strong>Improvements Found:</strong> 5</p><table><thead><tr><th>Table</th><th>Column</th><th>Old Confidence</th><th>New Confidence</th><th>New Target</th></tr></thead><tbody><tr><td>order_items</td><td><strong>item_id</strong></td><td class="poor">0.0%</td><td class="perfect">100.0%</td><td>item_id <span style="color: green;">(+0.0%)</span></td></tr><tr><td>order_items</td><td><strong>order_id</strong></td><td class="poor">0.0%</td><td class="perfect">53.3%</td><td>item_id <span style="color: green;">(+0.0%)</span></td></tr><tr><td>order_items</td><td><strong>product_id</strong></td><td class="poor">0.0%</td><td class="perfect">100.0%</td><td>item_id <span style="color: green;">(+0.0%)</span></td></tr><tr><td>order_items</td><td><strong>quantity</strong></td><td class="poor">0.0%</td><td class="perfect">100.0%</td><td>stock_count <span style="color: green;">(+0.0%)</span></td></tr><tr><td>order_items</td><td><strong>item_price</strong></td><td class="poor">0.0%</td><td class="perfect">75.0%</td><td>item_id <span style="color: green;">(+0.0%)</span></td></tr></tbody></table></div><div class="iteration-box"><h4>Iteration 2</h4><p><strong>Improvements Found:</strong> 2</p><table><thead><tr><th>Table</th><th>Column</th><th>Old Confidence</th><th>New Confidence</th><th>New Target</th></tr></thead><tbody><tr><td>order_items</td><td><strong>order_id</strong></td><td class="poor">0.0%</td><td class="perfect">53.3%</td><td>item_id <span style="color: green;">(+0.0%)</span></td></tr><tr><td>order_items</td><td><strong>item_price</strong></td><td class="poor">0.0%</td><td class="perfect">75.0%</td><td>item_id <span style="color: green;">(+0.0%)</span></td></tr></tbody></table></div><div class="iteration-box"><h4>Iteration 3</h4><p><strong>Improvements Found:</strong> 2</p><table><thead><tr><th>Table</th><th>Column</th><th>Old Confidence</th><th>New Confidence</th><th>New Target</th></tr></thead><tbody><tr><td>order_items</td><td><strong>order_id</strong></td><td class="poor">0.0%</td><td class="perfect">53.3%</td><td>item_id <span style="color: green;">(+0.0%)</span></td></tr><tr><td>order_items</td><td><strong>item_price</strong></td><td class="poor">0.0%</td><td class="perfect">75.0%</td><td>item_id <span style="color: green;">(+0.0%)</span></td></tr></tbody></table></div></div><h2>🗑️ Discarded Columns</h2><div class="section"><p>The following columns could not be mapped with acceptable confidence:</p><table><thead><tr><th>Table</th><th>Column</th><th>Final Confidence</th><th>Reason</th></tr></thead><tbody><tr><td>customers</td><td><strong>customer_id</strong></td><td class="poor">0.0%</td><td>No acceptable mapping found after iterations</td></tr><tr><td>customers</td><td><strong>full_name</strong></td><td class="poor">0.0%</td><td>No acceptable mapping found after iterations</td></tr><tr><td>customers</td><td><strong>email_address</strong></td><td class="poor">0.0%</td><td>No acceptable mapping found after iterations</td></tr><tr><td>customers</td><td><strong>phone_number</strong></td><td class="poor">0.0%</td><td>No acceptable mapping found after iterations</td></tr><tr><td>customers</td><td><strong>registration_date</strong></td><td class="poor">0.0%</td><td>No acceptable mapping found after iterations</td></tr><tr><td>customers</td><td><strong>customer_status</strong></td><td class="poor">0.0%</td><td>No acceptable mapping found after iterations</td></tr><tr><td>orders</td><td><strong>order_id</strong></td><td class="poor">0.0%</td><td>No acceptable mapping found after iterations</td></tr><tr><td>orders</td><td><strong>customer_id</strong></td><td class="poor">0.0%</td><td>No acceptable mapping found after iterations</td></tr><tr><td>orders</td><td><strong>order_date</strong></td><td class="poor">0.0%</td><td>No acceptable mapping found after iterations</td></tr><tr><td>orders</td><td><strong>total_amount</strong></td><td class="poor">0.0%</td><td>No acceptable mapping found after iterations</td></tr><tr><td>orders</td><td><strong>order_status</strong></td><td class="poor">0.0%</td><td>No acceptable mapping found after iterations</td></tr><tr><td>products</td><td><strong>product_name</strong></td><td class="poor">0.0%</td><td>No acceptable mapping found after iterations</td></tr><tr><td>products</td><td><strong>product_category</strong></td><td class="poor">0.0%</td><td>No acceptable mapping found after iterations</td></tr><tr><td>products</td><td><strong>unit_price</strong></td><td class="poor">0.0%</td><td>No acceptable mapping found after iterations</td></tr><tr><td>products</td><td><strong>stock_quantity</strong></td><td class="poor">0.0%</td><td>No acceptable mapping found after iterations</td></tr><tr><td>order_items</td><td><strong>order_id</strong></td><td class="poor">0.0%</td><td>No acceptable mapping found after iterations</td></tr><tr><td>order_items</td><td><strong>item_price</strong></td><td class="poor">0.0%</td><td>No acceptable mapping found after iterations</td></tr></tbody></table></div>
+        <div style="text-align: center; margin-top: 40px; padding: 20px; background: #f0f0f0; border-radius: 5px;">
+            <p><strong>Report Generated:</strong> 2026-02-07T09:38:15.640375</p>
+            <p><em>Enhanced Round-Trip Migration System with Iterative Re-mapping</em></p>
+        </div>
+    </div>
+</body>
+</html>

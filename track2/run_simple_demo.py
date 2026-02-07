@@ -4,7 +4,12 @@ Standalone Iterative Reverse Mapping Demo
 Shows the complete process without requiring user input
 """
 
+import sys
+
+sys.path.insert(0, 'outputs')
+
 from data_migration_system import run_iterative_migration
+from generate_html_report import create_html_report
 
 
 def main():
@@ -156,6 +161,13 @@ Let's see it in action!
     print("=" * 80)
     print("\n✅ outputs/iterative_mapping_results.json")
     print("   Full results in JSON format")
+
+    # Generate HTML report
+    print("\n📊 Generating HTML report...")
+    html_path = "outputs/iterative_mapping_report.html"
+    create_html_report(results, html_path)
+    print(f"✅ {html_path}")
+    print("   Interactive HTML report - Open in your browser!")
 
     return results
 

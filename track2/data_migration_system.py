@@ -11,13 +11,16 @@ Features:
 """
 
 import sqlite3
+import pandas as pd
 import numpy as np
-from datetime import datetime
+from datetime import datetime, date
 from typing import Dict, List, Tuple, Any, Optional
 import json
 import re
 from difflib import SequenceMatcher
+from collections import defaultdict
 import warnings
+
 warnings.filterwarnings('ignore')
 
 
@@ -237,9 +240,9 @@ class AIColumnMapper:
         return 0.5, "No specific patterns detected"
 
     def map_columns(self,
-                   source_schema: Dict[str, Any],
-                   target_schema: Dict[str, Any],
-                   confidence_threshold: float = 0.3) -> Dict[str, Any]:
+                    source_schema: Dict[str, Any],
+                    target_schema: Dict[str, Any],
+                    confidence_threshold: float = 0.3) -> Dict[str, Any]:
         """
         Generate intelligent column mappings with confidence scores and explanations
         """
@@ -300,7 +303,7 @@ class AIColumnMapper:
                         'confidence': best_score,
                         'source_type': src_col['type'],
                         'target_type': next(c['type'] for c in tgt_info['columns']
-                                          if c['name'] == best_match),
+                                            if c['name'] == best_match),
                         'explanation': best_explanation,
                         'transformation_required': src_col['type'] != next(
                             c['type'] for c in tgt_info['columns'] if c['name'] == best_match
@@ -397,9 +400,9 @@ class IterativeReverseMapper:
         """
         Main method to perform iterative reverse mapping
         """
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("ITERATIVE REVERSE MAPPING - ROUND-TRIP VALIDATION")
-        print("="*80)
+        print("=" * 80)
 
         # Step 1: Analyze schemas
         print("\n📊 Step 1: Analyzing schemas...")
@@ -505,8 +508,8 @@ class IterativeReverseMapper:
         return migrated_data
 
     def _migrate_reverse(self, tgt_analyzer: SchemaAnalyzer,
-                        reverse_mappings: Dict,
-                        forward_data: Dict) -> Dict:
+                         reverse_mappings: Dict,
+                         forward_data: Dict) -> Dict:
         """Migrate data in reverse using forward migrated data"""
         reverse_data = {}
 
@@ -550,8 +553,8 @@ class IterativeReverseMapper:
         return reverse_data
 
     def _compare_original_vs_derived(self, src_analyzer: SchemaAnalyzer,
-                                    reverse_data: Dict,
-                                    source_schema: Dict) -> Dict:
+                                     reverse_data: Dict,
+                                     source_schema: Dict) -> Dict:
         """Compare original source with derived source after round-trip"""
         comparison_results = {}
 
@@ -655,10 +658,10 @@ class IterativeReverseMapper:
         return str(val1) == str(val2)
 
     def _refine_mappings(self, comparison_results: Dict,
-                        forward_mappings: Dict,
-                        reverse_mappings: Dict,
-                        source_schema: Dict,
-                        target_schema: Dict) -> Dict:
+                         forward_mappings: Dict,
+                         reverse_mappings: Dict,
+                         source_schema: Dict,
+                         target_schema: Dict) -> Dict:
         """
         Refine mappings based on comparison results
         - Keep 100% confidence mappings
@@ -723,14 +726,15 @@ class IterativeReverseMapper:
             # Re-attempt low confidence columns
             for col_name in low_confidence_columns:
                 src_col_info = next((c for c in source_schema[table_name]['columns']
-                                   if c['name'] == col_name), None)
+                                     if c['name'] == col_name), None)
 
                 if not src_col_info or not available_target_cols:
                     # Keep original mapping but mark as low confidence
                     for mapping in forward_mappings[corresponding_forward_key]:
                         if mapping['source_column'] == col_name:
                             refined_mapping = mapping.copy()
-                            refined_mapping['refined_confidence'] = comparison['column_comparisons'][col_name]['confidence']
+                            refined_mapping['refined_confidence'] = comparison['column_comparisons'][col_name][
+                                'confidence']
                             refined_mapping['refinement_reason'] = comparison['column_comparisons'][col_name]['reason']
                             refined_column_mappings.append(refined_mapping)
                             break
@@ -816,12 +820,13 @@ def run_iterative_migration(source_db: str, target_db: str, sample_size: int = 5
     results = mapper.perform_iterative_mapping()
 
     # Print summary
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("ITERATIVE MAPPING SUMMARY")
-    print("="*80)
+    print("=" * 80)
     summary = results['summary']
     print(f"\nTotal Columns Analyzed: {summary['total_columns_analyzed']}")
-    print(f"Perfect Round-Trip Matches: {summary['perfect_round_trip_matches']} ({summary['perfect_match_percentage']:.1f}%)")
+    print(
+        f"Perfect Round-Trip Matches: {summary['perfect_round_trip_matches']} ({summary['perfect_match_percentage']:.1f}%)")
     print(f"Improved Mappings: {summary['improved_mappings']}")
     print(f"Discarded Mappings: {summary['discarded_mappings']}")
     print(f"Overall Confidence: {summary['overall_confidence']:.2%}")
@@ -850,6 +855,7 @@ if __name__ == "__main__":
                 return float(obj)
             else:
                 return obj
+
 
         json.dump(convert_types(results), f, indent=2)
 
