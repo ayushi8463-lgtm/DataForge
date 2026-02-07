@@ -1157,6 +1157,6 @@ MIT License
 **Ready to migrate with confidence?**
 
 ```bash
-python run_iterative_demo.py
+python run_simple_demo.py
 open iterative_mapping_report.html
 ```

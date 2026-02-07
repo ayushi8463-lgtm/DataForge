@@ -870,8 +870,8 @@ if __name__ == "__main__":
     import sys
     
     # Load results from JSON
-    json_path = sys.argv[1] if len(sys.argv) > 1 else '/home/claude/outputs/iterative_mapping_results.json'
-    output_path = sys.argv[2] if len(sys.argv) > 2 else '/home/claude/outputs/iterative_mapping_report.html'
+    json_path = sys.argv[1] if len(sys.argv) > 1 else 'outputs/iterative_mapping_results.json'
+    output_path = sys.argv[2] if len(sys.argv) > 2 else 'outputs/iterative_mapping_report.html'
     
     try:
         with open(json_path, 'r') as f:
