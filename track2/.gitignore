@@ -1,1 +1,5 @@
 .idea
+track2/outputs/
+*.db
+*.json
+*.html
