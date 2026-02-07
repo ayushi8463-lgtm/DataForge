@@ -64,6 +64,20 @@ except ImportError:
     subprocess.run(['pip', 'install', '-q', 'networkx'], check=True)
     import networkx as nx
 
+try:
+    import community.community_louvain as community_louvain
+    HAS_COMMUNITY = True
+except ImportError:
+    print("Installing python-louvain for graph clustering...")
+    import subprocess
+    try:
+        subprocess.run(['pip', 'install', '-q', 'python-louvain'], check=True)
+        import community.community_louvain as community_louvain
+        HAS_COMMUNITY = True
+    except:
+        print("  Note: Graph clustering unavailable, using fallback method")
+        HAS_COMMUNITY = False
+
 
 @dataclass
 class SourceReference:
@@ -229,10 +243,12 @@ class GETSExtractor:
     """Graph-based Extractive Text Summarization (GETS-like implementation)"""
     
     def __init__(self, model_name='all-MiniLM-L6-v2'):
+        print("Loading sentence embedding model...")
         self.model = SentenceTransformer(model_name)
+        print("✓ Sentence embedding model loaded")
     
     def extract_key_sentences(self, text: str, num_sentences: int = 3, source: SourceReference = None) -> List[Dict[str, Any]]:
-        """Extract key sentences using graph-based approach"""
+        """Extract key sentences using graph-based approach with clustering"""
         # Split into sentences
         sentences = re.split(r'(?<=[.!?])\s+', text)
         sentences = [s.strip() for s in sentences if len(s.strip()) > 10]
@@ -248,31 +264,81 @@ class GETSExtractor:
         for i in range(len(sentences)):
             G.add_node(i)
         
-        # Add edges based on cosine similarity
+        # Add edges based on cosine similarity (Jaccard-inspired threshold)
+        similarity_threshold = 0.3
         for i in range(len(sentences)):
             for j in range(i + 1, len(sentences)):
                 similarity = util.cos_sim(embeddings[i], embeddings[j]).item()
-                if similarity > 0.3:  # Threshold
+                if similarity > similarity_threshold:
                     G.add_edge(i, j, weight=similarity)
         
-        # Use PageRank to find important sentences
+        # Apply graph clustering for coherence (Louvain community detection)
+        if HAS_COMMUNITY:
+            try:
+                communities = community_louvain.best_partition(G, weight='weight')
+            except Exception as e:
+                print(f"  Warning: Community detection failed: {e}")
+                # Fallback: Use connected components
+                communities = {}
+                for idx, component in enumerate(nx.connected_components(G)):
+                    for node in component:
+                        communities[node] = idx
+        else:
+            # Fallback: Use connected components if community detection not available
+            communities = {}
+            for idx, component in enumerate(nx.connected_components(G)):
+                for node in component:
+                    communities[node] = idx
+        
+        # Use PageRank within communities to find important sentences
         try:
             scores = nx.pagerank(G, weight='weight')
         except:
             scores = {i: 1.0 for i in range(len(sentences))}
         
-        # Select top sentences
+        # Enhance scores based on community centrality
+        community_sizes = {}
+        for node, comm in communities.items():
+            community_sizes[comm] = community_sizes.get(comm, 0) + 1
+        
+        # Boost scores for sentences in larger communities (more central topics)
+        for node, comm in communities.items():
+            scores[node] *= (1 + 0.1 * community_sizes[comm])
+        
+        # Select top sentences, ensuring diversity across communities
         ranked_sentences = sorted(scores.items(), key=lambda x: x[1], reverse=True)
-        top_indices = [idx for idx, _ in ranked_sentences[:num_sentences]]
-        top_indices.sort()  # Maintain order
+        
+        selected_indices = []
+        selected_communities = set()
+        
+        # First pass: Select best sentence from each community
+        for idx, score in ranked_sentences:
+            comm = communities[idx]
+            if comm not in selected_communities:
+                selected_indices.append(idx)
+                selected_communities.add(comm)
+                if len(selected_indices) >= num_sentences:
+                    break
+        
+        # Second pass: Fill remaining slots with highest scores
+        if len(selected_indices) < num_sentences:
+            for idx, score in ranked_sentences:
+                if idx not in selected_indices:
+                    selected_indices.append(idx)
+                    if len(selected_indices) >= num_sentences:
+                        break
+        
+        # Sort to maintain original order
+        selected_indices.sort()
         
         result = []
-        for idx in top_indices:
+        for idx in selected_indices:
             result.append({
                 'text': sentences[idx],
                 'score': scores[idx],
                 'source': source,
-                'sentence_idx': idx
+                'sentence_idx': idx,
+                'community': communities.get(idx, -1)
             })
         
         return result
@@ -363,18 +429,47 @@ class ContradictionDetector:
 class HierarchicalCompressor:
     """Main compression engine implementing hierarchical compression"""
     
-    def __init__(self):
+    def __init__(self, use_gpu=False):
         self.critical_extractor = CriticalContentExtractor()
         self.gets_extractor = GETSExtractor()
         self.contradiction_detector = ContradictionDetector()
         
-        # Load summarization model
-        try:
-            print("Loading summarization model (this may take a minute)...")
-            self.summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
-        except:
-            print("Warning: Could not load BART model. Using GETS extraction as summarization.")
-            self.summarizer = None
+        # Load summarization model with better error handling
+        self.summarizer = None
+        print("Loading summarization model (this may take 1-2 minutes)...")
+        
+        # Try different models in order of preference
+        models_to_try = [
+            ("facebook/bart-large-cnn", "BART-large"),
+            ("sshleifer/distilbart-cnn-12-6", "DistilBART"),
+            ("t5-small", "T5-small")
+        ]
+        
+        for model_name, display_name in models_to_try:
+            try:
+                print(f"  Attempting to load {display_name}...")
+                self.summarizer = pipeline(
+                    "summarization", 
+                    model=model_name,
+                    device=0 if use_gpu else -1,
+                    framework="pt"
+                )
+                print(f"✓ Successfully loaded {display_name}")
+                break
+            except Exception as e:
+                print(f"  ✗ Failed to load {display_name}: {str(e)[:100]}")
+                continue
+        
+        if self.summarizer is None:
+            print("\n⚠ Warning: Could not load any summarization model.")
+            print("  Falling back to GETS extractive summarization.")
+            print("  This will still work but summaries will be extractive rather than abstractive.")
+            print("\nTo fix this issue:")
+            print("  1. Ensure you have internet connection for model download")
+            print("  2. Install: pip install transformers torch")
+            print("  3. For GPU support: pip install transformers torch torchvision")
+        else:
+            print("✓ Summarization model ready")
     
     def extract_text_from_pdf(self, pdf_path: str) -> List[Dict[str, Any]]:
         """Extract text from PDF with paragraph-level granularity"""
@@ -575,20 +670,62 @@ class HierarchicalCompressor:
     
     def _generate_summary(self, text: str, max_length: int = 150) -> str:
         """Generate abstractive summary using BART or fallback to extractive"""
-        if self.summarizer is None or len(text.split()) < 50:
-            # Fallback: return truncated text
-            words = text.split()[:max_length]
-            return ' '.join(words) + ('...' if len(text.split()) > max_length else '')
+        # Handle very short text
+        if len(text.split()) < 30:
+            return text
         
+        # If no summarizer available, use GETS extractive method
+        if self.summarizer is None:
+            # Use GETS to extract key sentences
+            temp_source = SourceReference(page=0, paragraph_idx=0, original_text=text)
+            key_sentences = self.gets_extractor.extract_key_sentences(
+                text, 
+                num_sentences=max(3, max_length // 50),
+                source=temp_source
+            )
+            summary = ' '.join([s['text'] for s in key_sentences])
+            
+            # Truncate if still too long
+            words = summary.split()
+            if len(words) > max_length:
+                summary = ' '.join(words[:max_length]) + '...'
+            
+            return summary
+        
+        # Try to use the summarizer
         try:
-            # Use BART for abstractive summarization
+            # Truncate input if too long for model (most models have 1024 token limit)
+            words = text.split()
+            if len(words) > 1000:
+                text = ' '.join(words[:1000])
+            
             min_length = max(30, max_length // 3)
-            summary = self.summarizer(text, max_length=max_length, min_length=min_length, do_sample=False)
+            summary = self.summarizer(
+                text, 
+                max_length=max_length, 
+                min_length=min_length, 
+                do_sample=False,
+                truncation=True
+            )
             return summary[0]['summary_text']
+            
         except Exception as e:
-            print(f"Warning: Summarization failed ({e}), using extractive fallback")
-            words = text.split()[:max_length]
-            return ' '.join(words) + ('...' if len(text.split()) > max_length else '')
+            print(f"  Warning: Summarization failed ({str(e)[:50]}), using extractive fallback")
+            # Fallback to GETS
+            temp_source = SourceReference(page=0, paragraph_idx=0, original_text=text)
+            key_sentences = self.gets_extractor.extract_key_sentences(
+                text, 
+                num_sentences=max(3, max_length // 50),
+                source=temp_source
+            )
+            summary = ' '.join([s['text'] for s in key_sentences])
+            
+            # Truncate if needed
+            words = summary.split()
+            if len(words) > max_length:
+                summary = ' '.join(words[:max_length]) + '...'
+            
+            return summary
 
 
 def main():
