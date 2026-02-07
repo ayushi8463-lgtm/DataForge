@@ -438,61 +438,119 @@ class HierarchicalCompressor:
         self.summarizer = None
         self.summarizer_type = None
         print("Loading summarization model (this may take 1-2 minutes)...")
-
-        # Try different models in order of preference
+        
+        # Try different models with different task names (compatibility across transformers versions)
         # Format: (model_name, display_name, task_type)
         models_to_try = [
             ("sshleifer/distilbart-cnn-12-6", "DistilBART", "summarization"),
             ("facebook/bart-large-cnn", "BART-large", "summarization"),
             ("philschmid/bart-large-cnn-samsum", "BART-samsum", "summarization"),
         ]
-
+        
+        # Also try with text2text-generation task (for newer/different transformers versions)
+        alt_models = [
+            ("sshleifer/distilbart-cnn-12-6", "DistilBART-t2t", "text2text-generation"),
+            ("facebook/bart-large-cnn", "BART-large-t2t", "text2text-generation"),
+        ]
+        
         device = 0 if use_gpu else -1
-
+        
+        # Try with summarization task first
         for model_name, display_name, task in models_to_try:
             try:
                 print(f"  Attempting to load {display_name}...")
                 self.summarizer = pipeline(
-                    task,
+                    task, 
                     model=model_name,
                     device=device
                 )
                 self.summarizer_type = display_name
+                self.summarizer_task = task
                 print(f"✓ Successfully loaded {display_name}")
                 break
             except Exception as e:
                 error_msg = str(e)
-                if len(error_msg) > 100:
+                if "Unknown task" in error_msg:
+                    # Try alternative task names
+                    continue
+                elif len(error_msg) > 100:
                     error_msg = error_msg[:100] + "..."
-                print(f"  ✗ Failed to load {display_name}: {error_msg}")
+                print(f"  ✗ Failed: {error_msg}")
                 continue
-
+        
+        # If summarization task didn't work, try text2text-generation
+        if self.summarizer is None:
+            print("  Trying alternative task type (text2text-generation)...")
+            for model_name, display_name, task in alt_models:
+                try:
+                    print(f"  Attempting to load {display_name}...")
+                    self.summarizer = pipeline(
+                        task, 
+                        model=model_name,
+                        device=device
+                    )
+                    self.summarizer_type = display_name
+                    self.summarizer_task = task
+                    print(f"✓ Successfully loaded {display_name}")
+                    break
+                except Exception as e:
+                    error_msg = str(e)
+                    if len(error_msg) > 100:
+                        error_msg = error_msg[:100] + "..."
+                    print(f"  ✗ Failed: {error_msg}")
+                    continue
+        
+        # Final fallback: try loading model directly without pipeline
+        if self.summarizer is None:
+            try:
+                print("  Trying direct model loading...")
+                from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+                
+                model_name = "sshleifer/distilbart-cnn-12-6"
+                tokenizer = AutoTokenizer.from_pretrained(model_name)
+                model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
+                
+                # Create custom summarizer function
+                def custom_summarize(text, max_length=150, min_length=30):
+                    inputs = tokenizer(text, return_tensors="pt", max_length=1024, truncation=True)
+                    summary_ids = model.generate(inputs["input_ids"], max_length=max_length, min_length=min_length, num_beams=4, early_stopping=True)
+                    return [{"summary_text": tokenizer.decode(summary_ids[0], skip_special_tokens=True)}]
+                
+                self.summarizer = custom_summarize
+                self.summarizer_type = "DistilBART-direct"
+                self.summarizer_task = "custom"
+                print("✓ Successfully loaded model directly")
+                
+            except Exception as e:
+                print(f"  ✗ Direct loading also failed: {str(e)[:100]}")
+        
         if self.summarizer is None:
             print("\n⚠ Warning: Could not load any summarization model.")
             print("  Falling back to GETS extractive summarization.")
             print("  This will still work but summaries will be extractive rather than abstractive.")
             print("\n💡 Common causes:")
+            print("  - Incompatible transformers version (try: pip install --upgrade transformers)")
             print("  - No internet connection (models need to download on first run)")
             print("  - Insufficient memory (try restarting runtime)")
-            print("  - Missing dependencies (run: pip install transformers torch)")
             print("\n✓ System will continue with extractive summarization (still fully functional)")
             self.summarizer_type = "GETS-Extractive"
+            self.summarizer_task = "extractive"
         else:
             print(f"✓ Summarization model ready ({self.summarizer_type})")
-
+    
     def test_setup(self):
         """Test that all components are working properly"""
         print("="*70)
         print("TESTING SYSTEM SETUP")
         print("="*70)
-
+        
         results = {
             'critical_extractor': False,
             'gets_extractor': False,
             'contradiction_detector': False,
             'summarizer': False
         }
-
+        
         # Test critical content extractor
         try:
             test_text = "The maximum limit is 500 units per day, except on holidays."
@@ -505,7 +563,7 @@ class HierarchicalCompressor:
                 print("⚠ Critical Content Extractor: No facts extracted (may need tuning)")
         except Exception as e:
             print(f"✗ Critical Content Extractor: Error - {e}")
-
+        
         # Test GETS extractor
         try:
             test_text = "First sentence. Second sentence with content. Third sentence here."
@@ -518,7 +576,7 @@ class HierarchicalCompressor:
                 print("⚠ GETS Extractor: No sentences extracted")
         except Exception as e:
             print(f"✗ GETS Extractor: Error - {e}")
-
+        
         # Test contradiction detector
         try:
             test_statements = [
@@ -530,7 +588,7 @@ class HierarchicalCompressor:
             print(f"✓ Contradiction Detector: Working ({len(contradictions)} contradictions found)")
         except Exception as e:
             print(f"✗ Contradiction Detector: Error - {e}")
-
+        
         # Test summarizer
         if self.summarizer is not None:
             try:
@@ -546,7 +604,7 @@ class HierarchicalCompressor:
         else:
             results['summarizer'] = True  # Extractive fallback is OK
             print(f"✓ Summarizer (GETS-Extractive fallback): Working")
-
+        
         print("="*70)
         all_working = all(results.values())
         if all_working:
@@ -558,23 +616,23 @@ class HierarchicalCompressor:
             failed = [k for k, v in results.items() if not v]
             print(f"  Failed components: {', '.join(failed)}")
         print("="*70)
-
+        
         return all_working
-
+    
     def extract_text_from_pdf(self, pdf_path: str) -> List[Dict[str, Any]]:
         """Extract text from PDF with paragraph-level granularity"""
         print(f"Extracting text from PDF: {pdf_path}")
         paragraphs = []
-
+        
         with pdfplumber.open(pdf_path) as pdf:
             for page_num, page in enumerate(pdf.pages, start=1):
                 text = page.extract_text()
                 if not text:
                     continue
-
+                
                 # Split by double newlines (paragraph breaks)
                 page_paragraphs = re.split(r'\n\s*\n', text)
-
+                
                 for para_idx, para_text in enumerate(page_paragraphs):
                     para_text = para_text.strip()
                     if len(para_text) > 50:  # Minimum paragraph length
@@ -588,11 +646,11 @@ class HierarchicalCompressor:
                                 original_text=para_text
                             )
                         })
-
+        
         print(f"Extracted {len(paragraphs)} paragraphs from {len(pdf.pages)} pages")
         return paragraphs
-
-    def compress_hierarchically(self, paragraphs: List[Dict[str, Any]],
+    
+    def compress_hierarchically(self, paragraphs: List[Dict[str, Any]], 
                                  section_size: int = 5,
                                  chapter_size: int = 3) -> Dict[str, Any]:
         """
@@ -600,14 +658,14 @@ class HierarchicalCompressor:
         Paragraphs → Sections → Chapters → Document
         """
         print("\n=== Starting Hierarchical Compression ===\n")
-
+        
         # Level 1: Process paragraphs
         print("Level 1: Processing paragraphs...")
         paragraph_compressions = []
         for para in paragraphs:
             compression = self._compress_paragraph(para)
             paragraph_compressions.append(compression)
-
+        
         # Level 2: Group into sections and compress
         print(f"\nLevel 2: Creating sections (groups of {section_size} paragraphs)...")
         sections = self._group_into_sections(paragraph_compressions, section_size)
@@ -615,7 +673,7 @@ class HierarchicalCompressor:
         for sec_idx, section in enumerate(sections):
             compression = self._compress_section(section, sec_idx)
             section_compressions.append(compression)
-
+        
         # Level 3: Group sections into chapters and compress
         print(f"\nLevel 3: Creating chapters (groups of {chapter_size} sections)...")
         chapters = self._group_into_chapters(section_compressions, chapter_size)
@@ -623,11 +681,11 @@ class HierarchicalCompressor:
         for chap_idx, chapter in enumerate(chapters):
             compression = self._compress_chapter(chapter, chap_idx)
             chapter_compressions.append(compression)
-
+        
         # Level 4: Create document summary
         print("\nLevel 4: Creating document-level summary...")
         document_summary = self._compress_document(chapter_compressions)
-
+        
         # Collect all critical facts and contradictions
         all_facts = []
         all_contradictions = []
@@ -635,14 +693,14 @@ class HierarchicalCompressor:
             all_facts.extend(para['critical_facts'])
         for sec in section_compressions:
             all_contradictions.extend(sec['contradictions'])
-
+        
         print("\n=== Compression Complete ===\n")
         print(f"Total paragraphs: {len(paragraph_compressions)}")
         print(f"Total sections: {len(section_compressions)}")
         print(f"Total chapters: {len(chapter_compressions)}")
         print(f"Critical facts extracted: {len(all_facts)}")
         print(f"Contradictions detected: {len(all_contradictions)}")
-
+        
         return {
             'document_summary': document_summary,
             'chapters': chapter_compressions,
@@ -658,21 +716,21 @@ class HierarchicalCompressor:
                 'total_contradictions': len(all_contradictions)
             }
         }
-
+    
     def _compress_paragraph(self, paragraph: Dict[str, Any]) -> Dict[str, Any]:
         """Compress a single paragraph"""
         text = paragraph['text']
         source = paragraph['source']
-
+        
         # Extract critical facts
         critical_facts = self.critical_extractor.extract_from_text(text, source)
-
+        
         # Extract key sentences using GETS
         key_sentences = self.gets_extractor.extract_key_sentences(text, num_sentences=2, source=source)
-
+        
         # Create extractive summary
         extractive_summary = ' '.join([s['text'] for s in key_sentences])
-
+        
         return {
             'id': f"para_{source.page}_{source.paragraph_idx}",
             'original_text': text,
@@ -682,30 +740,30 @@ class HierarchicalCompressor:
             'source': source.to_dict(),
             'level': 'paragraph'
         }
-
+    
     def _group_into_sections(self, paragraphs: List[Dict], size: int) -> List[List[Dict]]:
         """Group paragraphs into sections"""
         sections = []
         for i in range(0, len(paragraphs), size):
             sections.append(paragraphs[i:i + size])
         return sections
-
+    
     def _compress_section(self, paragraphs: List[Dict], section_idx: int) -> Dict[str, Any]:
         """Compress a section (group of paragraphs)"""
         # Combine extractive summaries
         combined_text = ' '.join([p['extractive_summary'] for p in paragraphs])
-
+        
         # Generate abstractive summary using BART
         abstractive_summary = self._generate_summary(combined_text, max_length=150)
-
+        
         # Detect contradictions within section
-        statements = [{'text': p['extractive_summary'], 'source': SourceReference(**p['source'])}
+        statements = [{'text': p['extractive_summary'], 'source': SourceReference(**p['source'])} 
                       for p in paragraphs]
         contradictions = self.contradiction_detector.detect_contradictions(statements)
-
+        
         # Collect child paragraph IDs
         child_ids = [p['id'] for p in paragraphs]
-
+        
         return {
             'id': f"section_{section_idx}",
             'abstractive_summary': abstractive_summary,
@@ -714,134 +772,144 @@ class HierarchicalCompressor:
             'child_paragraphs': child_ids,
             'level': 'section'
         }
-
+    
     def _group_into_chapters(self, sections: List[Dict], size: int) -> List[List[Dict]]:
         """Group sections into chapters"""
         chapters = []
         for i in range(0, len(sections), size):
             chapters.append(sections[i:i + size])
         return chapters
-
+    
     def _compress_chapter(self, sections: List[Dict], chapter_idx: int) -> Dict[str, Any]:
         """Compress a chapter (group of sections)"""
         # Combine abstractive summaries
         combined_text = ' '.join([s['abstractive_summary'] for s in sections])
-
+        
         # Generate chapter-level summary
         abstractive_summary = self._generate_summary(combined_text, max_length=200)
-
+        
         # Collect child section IDs
         child_ids = [s['id'] for s in sections]
-
+        
         return {
             'id': f"chapter_{chapter_idx}",
             'abstractive_summary': abstractive_summary,
             'child_sections': child_ids,
             'level': 'chapter'
         }
-
+    
     def _compress_document(self, chapters: List[Dict]) -> Dict[str, Any]:
         """Create document-level summary"""
         # Combine chapter summaries
         combined_text = ' '.join([c['abstractive_summary'] for c in chapters])
-
+        
         # Generate document summary
         abstractive_summary = self._generate_summary(combined_text, max_length=250)
-
+        
         # Collect child chapter IDs
         child_ids = [c['id'] for c in chapters]
-
+        
         return {
             'id': 'document',
             'abstractive_summary': abstractive_summary,
             'child_chapters': child_ids,
             'level': 'document'
         }
-
+    
     def _generate_summary(self, text: str, max_length: int = 150) -> str:
         """Generate abstractive summary using BART or fallback to extractive"""
         # Handle very short text
         if len(text.split()) < 30:
             return text
-
+        
         # If no summarizer available, use GETS extractive method
         if self.summarizer is None:
             # Use GETS to extract key sentences
             temp_source = SourceReference(page=0, paragraph_idx=0, original_text=text)
             key_sentences = self.gets_extractor.extract_key_sentences(
-                text,
+                text, 
                 num_sentences=max(3, max_length // 50),
                 source=temp_source
             )
             summary = ' '.join([s['text'] for s in key_sentences])
-
+            
             # Truncate if still too long
             words = summary.split()
             if len(words) > max_length:
                 summary = ' '.join(words[:max_length]) + '...'
-
+            
             return summary
-
+        
         # Try to use the summarizer
         try:
             # Truncate input if too long for model (most models have 1024 token limit)
             words = text.split()
             if len(words) > 1000:
                 text = ' '.join(words[:1000])
-
+            
             min_length = max(30, max_length // 3)
-            summary = self.summarizer(
-                text,
-                max_length=max_length,
-                min_length=min_length,
-                do_sample=False,
-                truncation=True
-            )
+            
+            # Handle different summarizer types
+            if self.summarizer_task == "custom":
+                # Custom direct model loading
+                summary = self.summarizer(text, max_length=max_length, min_length=min_length)
+            elif self.summarizer_task in ["summarization", "text2text-generation"]:
+                # Pipeline summarizer
+                summary = self.summarizer(
+                    text, 
+                    max_length=max_length, 
+                    min_length=min_length, 
+                    do_sample=False,
+                    truncation=True
+                )
+            else:
+                raise ValueError(f"Unknown summarizer task: {self.summarizer_task}")
+            
             return summary[0]['summary_text']
-
+            
         except Exception as e:
             print(f"  Warning: Summarization failed ({str(e)[:50]}), using extractive fallback")
             # Fallback to GETS
             temp_source = SourceReference(page=0, paragraph_idx=0, original_text=text)
             key_sentences = self.gets_extractor.extract_key_sentences(
-                text,
+                text, 
                 num_sentences=max(3, max_length // 50),
                 source=temp_source
             )
             summary = ' '.join([s['text'] for s in key_sentences])
-
+            
             # Truncate if needed
             words = summary.split()
             if len(words) > max_length:
                 summary = ' '.join(words[:max_length]) + '...'
-
+            
             return summary
 
 
 def main():
     """Main execution function for testing"""
     import sys
-
+    
     if len(sys.argv) < 2:
         print("Usage: python contextual_compression_engine.py <pdf_path>")
         sys.exit(1)
-
+    
     pdf_path = sys.argv[1]
-
+    
     # Initialize compressor
     compressor = HierarchicalCompressor()
-
+    
     # Extract text
     paragraphs = compressor.extract_text_from_pdf(pdf_path)
-
+    
     # Perform hierarchical compression
     result = compressor.compress_hierarchically(paragraphs, section_size=5, chapter_size=3)
-
+    
     # Save result
     output_path = 'compression_result.json'
     with open(output_path, 'w') as f:
         json.dump(result, f, indent=2, default=str)
-
+    
     print(f"\nResults saved to: {output_path}")
     return result
 
