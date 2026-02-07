@@ -6,7 +6,7 @@ Demonstrates specific features of the AI-powered migration system
 
 import json
 import sys
-sys.path.insert(0, '/home/claude')
+sys.path.insert(0, 'outputs')
 
 from data_migration_system import (
     AIColumnMapper, BidirectionalMapper, DataTransformer
